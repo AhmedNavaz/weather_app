@@ -1,6 +1,7 @@
 import 'city_entity.dart';
 
 class WeatherEntity {
+  final String id;
   final CityEntity city;
   final double temperature;
   final String description;
@@ -8,6 +9,7 @@ class WeatherEntity {
   final double windSpeed;
 
   WeatherEntity({
+    required this.id,
     required this.city,
     required this.temperature,
     required this.description,

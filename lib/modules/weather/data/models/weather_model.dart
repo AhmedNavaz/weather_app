@@ -4,12 +4,14 @@ import 'city_model.dart';
 
 class WeatherModel extends WeatherEntity {
   WeatherModel({
+    required String id,
     required CityEntity city,
     required double temperature,
     required String description,
     required double humidity,
     required double windSpeed,
   }) : super(
+          id: id,
           city: city,
           temperature: temperature,
           description: description,
@@ -19,6 +21,7 @@ class WeatherModel extends WeatherEntity {
 
   factory WeatherModel.fromJson(Map<String, dynamic> json) {
     return WeatherModel(
+      id: json['id'],
       city: CityModel.fromJson(json['city']),
       temperature: json['temperature'],
       description: json['description'],
