@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:geocoding/geocoding.dart';
 
+import '../../../../core/constants/constants.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/params/params.dart';
 import '../models/weather_model.dart';
@@ -15,14 +17,31 @@ class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
 
   @override
   Future<WeatherModel> getWeather({required WeatherParams params}) async {
-    String apiKey = '83c58183aacfc5dea87c7266d44ad0f5';
-    String lat = '35';
-    String lon = '139';
-    final response = await dio.get(
-        'https://api.openweathermap.org/data/3.0/onecall?lat=$lat&lon=$lon&appid=$apiKey');
+    try {
+      List<Location> locations = await locationFromAddress(params.cityName);
+      return _fetchWeather(
+          locations[0].latitude, locations[0].longitude, params.cityName);
+    } catch (_) {
+      throw ServerException();
+    }
+  }
 
+  Future<WeatherModel> _fetchWeather(
+      double lat, double lon, String cityName) async {
+    final response = await dio.get(
+      weatherUrl,
+      queryParameters: {
+        'lat': lat,
+        'lon': lon,
+        'units': 'metric',
+        'appid': apiKey,
+      },
+    );
     if (response.statusCode == 200) {
-      return WeatherModel.fromJson(response.data);
+      WeatherModel weatherModel = WeatherModel.fromJson(response.data);
+      weatherModel.city.name = cityName;
+      weatherModel.timezone = cityName;
+      return weatherModel;
     } else {
       throw ServerException();
     }

@@ -1,32 +1,91 @@
-import 'package:hive/hive.dart';
+import 'package:weather_app/modules/weather/business/entities/weather_entity.dart';
 
 import '../../../../core/errors/exceptions.dart';
+import '../../../../utils/hive.dart';
 import '../models/weather_model.dart';
 
 abstract class WeatherLocalDataSource {
   Future<void> cacheWeather(WeatherModel weatherModel);
 
-  Future<WeatherModel> getLastWeather();
+  Future<WeatherModel> getLastWeather(String key);
+
+  Future<List<WeatherModel>> getAllWeathers();
+
+  Future<void> deleteWeather(String key);
+
+  Future<void> reOrderWeather(List<WeatherModel> weatherList);
 }
 
 class WeatherLocalDataSourceImpl implements WeatherLocalDataSource {
-  final HiveInterface hive;
-
-  WeatherLocalDataSourceImpl({required this.hive});
+  WeatherLocalDataSourceImpl();
 
   @override
   Future<void> cacheWeather(WeatherModel weatherModel) async {
-    final box = await hive.openBox('weather');
-    await box.put('weather', weatherModel.toJson());
+    try {
+      List<WeatherModel> weatherList = await getAllWeathers();
+
+      int existingIndex = weatherList.indexWhere(
+        (existingWeather) =>
+            existingWeather.city.name == weatherModel.city.name,
+      );
+
+      if (existingIndex != -1) {
+        weatherList[existingIndex] = weatherModel;
+      } else {
+        weatherList.add(weatherModel);
+      }
+
+      HiveDatabase.storeCache(HiveDatabase.weather,
+          weatherList.map((weather) => weather.toJson()).toList());
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
-  Future<WeatherModel> getLastWeather() async {
-    final box = await hive.openBox('weather');
-    if (box.isNotEmpty) {
-      return WeatherModel.fromJson(box.get('weather'));
+  Future<WeatherModel> getLastWeather(String key) async {
+    final weatherBox = HiveDatabase.getCache(key);
+    if (weatherBox != null) {
+      return WeatherModel.fromJson(weatherBox);
     } else {
       throw CacheException();
     }
+  }
+
+  @override
+  Future<List<WeatherModel>> getAllWeathers() async {
+    try {
+      final weatherBox = HiveDatabase.getCache(HiveDatabase.weather);
+      List<WeatherModel> weatherList = [];
+      for (var weather in weatherBox) {
+        weatherList.add(WeatherModel.fromJson(weather));
+      }
+      if (weatherBox.isNotEmpty) {
+        return weatherList;
+      } else {
+        throw CacheException();
+      }
+    } catch (e) {
+      print(e);
+      return [];
+    }
+  }
+
+  @override
+  Future<void> deleteWeather(String key) async {
+    var getPreviousWeather = await HiveDatabase.getCache(HiveDatabase.weather);
+    for (int i = 0; i < getPreviousWeather.length; i++) {
+      if (WeatherModel.fromJson(getPreviousWeather[i]).city.name == key) {
+        getPreviousWeather.removeAt(i);
+        break;
+      }
+    }
+    HiveDatabase.storeCache(HiveDatabase.weather, getPreviousWeather);
+  }
+
+  @override
+  Future<void> reOrderWeather(List<WeatherModel> weatherList) async {
+    HiveDatabase.storeCache(HiveDatabase.weather,
+        weatherList.map((weather) => weather.toJson()).toList());
   }
 }

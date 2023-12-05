@@ -1,9 +1,11 @@
 class WeatherParams {
-  final String apiKey;
+  final double lat;
+  final double lon;
   final String cityName;
 
   const WeatherParams({
-    required this.apiKey,
+    required this.lat,
+    required this.lon,
     required this.cityName,
   });
 }

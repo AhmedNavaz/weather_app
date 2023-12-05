@@ -33,7 +33,8 @@ class WeatherRepositoryImpl implements WeatherRepository {
       }
     } else {
       try {
-        final localWeather = await localDataSource.getLastWeather();
+        final localWeather =
+            await localDataSource.getLastWeather(params.cityName);
         return Right(localWeather);
       } on CacheException {
         return Left(CacheFailure(errorMessage: 'No Cache Data Found'));

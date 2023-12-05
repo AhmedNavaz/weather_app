@@ -1,13 +1,16 @@
-String kTemplate = 'template';
+String weatherUrl = 'https://api.openweathermap.org/data/3.0/onecall';
+String weatherIconUrl = 'http://openweathermap.org/img/w/';
+String apiKey = '83c58183aacfc5dea87c7266d44ad0f5';
 
-String kName = 'name';
-String kId = 'id';
-String kSprites = 'sprites';
-String kTypes = 'types';
-String kType = 'type';
-String kOther = 'other';
-String kOfficialArtwork = 'official-artwork';
-String kFrontDefault = 'front_default';
-String kFrontShiny = 'front_shiny';
+// day background images for the weather card
+String sunnyDay = 'assets/images/day/clear.jpg';
+String cloudyDay = 'assets/images/day/cloudy.jpg';
+String rainyDay = 'assets/images/day/rainy.jpg';
 
-int maxPokemonId = 1008;
+// night background images for the weather card
+String clearNight = 'assets/images/night/clear.jpg';
+String cloudyNight = 'assets/images/night/cloudy.jpg';
+String rainyNight = 'assets/images/night/rainy.jpg';
+
+// weather icons
+String degreeSymbol = '°';
