@@ -1,12 +1,18 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:weather_app/core/connection/connection.dart';
+import 'package:weather_app/modules/weather/data/models/weather_model.dart';
 import 'package:weather_app/modules/weather/presentation/providers/home_provider.dart';
 import 'package:weather_app/modules/weather/presentation/providers/searhbar_provider.dart';
 
 import 'package:weather_app/modules/weather/presentation/widget/dropdown_widget.dart';
+import 'package:weather_app/modules/weather/presentation/widget/no_internet_widget.dart';
 import 'package:weather_app/modules/weather/presentation/widget/weather_card_widget.dart';
 
+import '../../../../utils/helper.dart';
 import '../extension/sliver_appbar_delegate_extention.dart';
 import '../widget/searchbar_widget.dart';
 
@@ -94,19 +100,23 @@ class _HomePageState extends State<HomePage> {
                           onReorder: (int oldIndex, int newIndex) {
                             homeProvider.reOrderCards(oldIndex, newIndex);
                           },
-                          children: homeProvider.cities
-                              .asMap()
-                              .map(
-                                (index, weatherModel) => MapEntry(
+                          children: [
+                            NoInternetWidget(key: UniqueKey()),
+                            ...homeProvider.cities
+                                .asMap()
+                                .map(
+                                  (index, weatherModel) => MapEntry(
                                     index,
                                     WeatherCardWidget(
                                       key: ValueKey(weatherModel),
                                       weatherModel: weatherModel,
                                       index: index,
-                                    )),
-                              )
-                              .values
-                              .toList(),
+                                    ),
+                                  ),
+                                )
+                                .values
+                                .toList(),
+                          ],
                         ),
                         searchbarProvider.isSearching
                             ? Container(

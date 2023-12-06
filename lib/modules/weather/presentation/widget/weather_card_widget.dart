@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
+import 'package:weather_app/core/connection/connection.dart';
 import 'package:weather_app/core/constants/constants.dart';
 import 'package:weather_app/modules/weather/presentation/extension/string_extention.dart';
 import 'package:weather_app/modules/weather/presentation/providers/home_provider.dart';
@@ -143,12 +145,21 @@ class WeatherCardWidget extends StatelessWidget {
                                       : const Spacer(),
                                   settingsProvider.isEditing
                                       ? const SizedBox()
-                                      : Text(
-                                          condition.capitalizeByWord(),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall,
-                                        ),
+                                      : context
+                                              .watch<ConnectionNotifier>()
+                                              .isOnline
+                                          ? Text(
+                                              condition.capitalizeByWord(),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall,
+                                            )
+                                          : Icon(
+                                              CupertinoIcons.wifi_slash,
+                                              color: Theme.of(context)
+                                                  .indicatorColor,
+                                              size: 15,
+                                            ),
                                 ],
                               ),
                               const Spacer(),

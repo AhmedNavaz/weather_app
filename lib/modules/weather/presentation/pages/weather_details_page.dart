@@ -64,117 +64,120 @@ class _WeatherDetailsPageState extends State<WeatherDetailsPage>
       cities[_currentIndex].current!.weather!.first.main!,
       localTime,
     );
-    return Hero(
-      tag: cities[widget.index].timezone!,
-      child: Scaffold(
-        extendBody: true,
-        extendBodyBehindAppBar: true,
-        backgroundColor: Colors.transparent,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(0),
-          child: AppBar(
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            automaticallyImplyLeading: false,
+    return SafeArea(
+      top: false,
+      child: Hero(
+        tag: cities[widget.index].timezone!,
+        child: Scaffold(
+          extendBody: true,
+          extendBodyBehindAppBar: true,
+          backgroundColor: Colors.transparent,
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(0),
+            child: AppBar(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              automaticallyImplyLeading: false,
+            ),
           ),
-        ),
-        body: Stack(
-          alignment: Alignment.center,
-          children: [
-            Positioned(
-              top: 0,
-              child: FadeTransition(
-                opacity: animation,
-                child: SizedBox(
-                  height: 100.h,
-                  child: Image.asset(
-                    backgroundImage,
-                    fit: BoxFit.cover,
+          body: Stack(
+            alignment: Alignment.center,
+            children: [
+              Positioned(
+                top: 0,
+                child: FadeTransition(
+                  opacity: animation,
+                  child: SizedBox(
+                    height: 100.h,
+                    child: Image.asset(
+                      backgroundImage,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
-            ),
-            PageView.builder(
-              physics: const BouncingScrollPhysics(),
-              controller: pageController,
-              itemCount: cities.length,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-                animationController.reset();
-                animationController.forward();
-              },
-              itemBuilder: (context, index) {
-                return WeatherDetailsWidget(
-                  weatherModel: cities[index],
-                );
-              },
-            ),
-            Positioned(
-              bottom: 0,
-              child: ClipRRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-                  child: Container(
-                    width: 100.w,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    height: 35,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        top: BorderSide(
-                          color: Colors.white.withOpacity(0.33),
-                          width: 1,
+              PageView.builder(
+                physics: const BouncingScrollPhysics(),
+                controller: pageController,
+                itemCount: cities.length,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                  animationController.reset();
+                  animationController.forward();
+                },
+                itemBuilder: (context, index) {
+                  return WeatherDetailsWidget(
+                    weatherModel: cities[index],
+                  );
+                },
+              ),
+              Positioned(
+                bottom: 0,
+                child: ClipRRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                    child: Container(
+                      width: 100.w,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      height: 35,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            color: Colors.white.withOpacity(0.33),
+                            width: 1,
+                          ),
                         ),
                       ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                            children: cities.asMap().entries.map((entry) {
-                          return GestureDetector(
-                            onTap: () {
-                              _currentIndex = entry.key;
-                            },
-                            child: entry.key == 0
-                                ? Icon(
-                                    CupertinoIcons.paperplane_fill,
-                                    color: _currentIndex == entry.key
-                                        ? Colors.white
-                                        : Colors.white.withOpacity(0.5),
-                                    size: 10,
-                                  )
-                                : Container(
-                                    margin: const EdgeInsets.only(left: 10),
-                                    width: 7,
-                                    height: 7,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                              children: cities.asMap().entries.map((entry) {
+                            return GestureDetector(
+                              onTap: () {
+                                _currentIndex = entry.key;
+                              },
+                              child: entry.key == 0
+                                  ? Icon(
+                                      CupertinoIcons.paperplane_fill,
                                       color: _currentIndex == entry.key
                                           ? Colors.white
                                           : Colors.white.withOpacity(0.5),
+                                      size: 10,
+                                    )
+                                  : Container(
+                                      margin: const EdgeInsets.only(left: 10),
+                                      width: 7,
+                                      height: 7,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: _currentIndex == entry.key
+                                            ? Colors.white
+                                            : Colors.white.withOpacity(0.5),
+                                      ),
                                     ),
-                                  ),
-                          );
-                        }).toList()),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Icon(
-                            CupertinoIcons.list_bullet,
-                            color: Colors.white,
-                            size: 22.5,
+                            );
+                          }).toList()),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Icon(
+                              CupertinoIcons.list_bullet,
+                              color: Colors.white,
+                              size: 22.5,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

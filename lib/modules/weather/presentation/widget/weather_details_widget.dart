@@ -11,6 +11,7 @@ import '../../../../core/constants/constants.dart';
 import '../../data/models/weather_model.dart';
 import 'hourly_card_widget.dart';
 import 'humidity_card_widget.dart';
+import 'no_internet_widget.dart';
 
 class WeatherDetailsWidget extends StatelessWidget {
   const WeatherDetailsWidget({super.key, required this.weatherModel});
@@ -27,6 +28,7 @@ class WeatherDetailsWidget extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(height: 05.h),
+              const NoInternetWidget(),
               Text(
                 weatherModel.timezone!,
                 style: Theme.of(context).textTheme.headlineLarge,
