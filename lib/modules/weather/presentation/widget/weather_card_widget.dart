@@ -2,39 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
+import 'package:sizer/sizer.dart';
 import 'package:weather_app/core/constants/constants.dart';
-import 'package:weather_app/modules/weather/business/entities/weather_entity.dart';
 import 'package:weather_app/modules/weather/presentation/extension/string_extention.dart';
 import 'package:weather_app/modules/weather/presentation/providers/home_provider.dart';
 import 'package:weather_app/modules/weather/presentation/providers/settings_provider.dart';
-import 'package:weather_app/modules/weather/presentation/widget/weather_details_widget.dart';
 
 import '../../../../utils/helper.dart';
+import '../../data/models/weather_model.dart';
 import '../pages/weather_details_page.dart';
 
 class WeatherCardWidget extends StatelessWidget {
   const WeatherCardWidget(
-      {super.key, required this.index, required this.weatherEntity});
+      {super.key, required this.index, required this.weatherModel});
 
   final int index;
-  final WeatherEntity weatherEntity;
+  final WeatherModel weatherModel;
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     DateTime localTime = Helper.convertToLocalTime(
-      weatherEntity.city.time,
-      weatherEntity.city.timezoneOffset,
+      weatherModel.current!.dt!,
+      weatherModel.timezoneOffset!,
     );
 
     return Consumer2<HomeProvider, SettingsProvider>(
         builder: (context, homeProvider, settingsProvider, child) {
-      String backgroundImage = homeProvider.getBackgroundImage(
-        weatherEntity.condition,
+      String condition = weatherModel.current!.weather!.first.main!;
+      String backgroundImage = homeProvider.getBackgroundImageCard(
+        condition,
         localTime,
       );
       return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20),
+        margin: EdgeInsets.symmetric(horizontal: 5.5.w),
         child: Slidable(
           key: key,
           enabled: index != 0,
@@ -52,7 +52,7 @@ class WeatherCardWidget extends StatelessWidget {
                   },
                   child: Container(
                     margin:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.8.h),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
                       color: const Color(0xFFFE4A49),
@@ -101,12 +101,10 @@ class WeatherCardWidget extends StatelessWidget {
                       );
                     },
                     child: Hero(
-                      tag: weatherEntity.city.name,
+                      tag: weatherModel.timezone!,
                       child: Container(
-                          height: settingsProvider.isEditing
-                              ? size.height * 0.09
-                              : size.height * 0.133,
-                          margin: const EdgeInsets.symmetric(vertical: 5),
+                          height: settingsProvider.isEditing ? 10.h : 14.h,
+                          margin: EdgeInsets.symmetric(vertical: 0.8.h),
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
@@ -126,7 +124,7 @@ class WeatherCardWidget extends StatelessWidget {
                                 children: [
                                   Text(
                                     index != 0
-                                        ? weatherEntity.city.name
+                                        ? weatherModel.timezone!
                                         : 'My Location',
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
@@ -134,7 +132,7 @@ class WeatherCardWidget extends StatelessWidget {
                                   const SizedBox(height: 2.5),
                                   Text(
                                     index == 0
-                                        ? weatherEntity.city.name
+                                        ? weatherModel.timezone!
                                         : DateFormat('hh:mm a')
                                             .format(localTime),
                                     style:
@@ -146,8 +144,7 @@ class WeatherCardWidget extends StatelessWidget {
                                   settingsProvider.isEditing
                                       ? const SizedBox()
                                       : Text(
-                                          weatherEntity.condition
-                                              .capitalizeByWord(),
+                                          condition.capitalizeByWord(),
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodySmall,
@@ -159,7 +156,7 @@ class WeatherCardWidget extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
-                                    '${homeProvider.getTemperatureInScale(context, weatherEntity.temperature)}$degreeSymbol',
+                                    '${homeProvider.getTemperatureInScale(context, weatherModel.current!.temp!)}$degreeSymbol',
                                     style: Theme.of(context)
                                         .textTheme
                                         .displayMedium,
@@ -170,7 +167,7 @@ class WeatherCardWidget extends StatelessWidget {
                                   settingsProvider.isEditing
                                       ? const SizedBox()
                                       : Text(
-                                          'H:${weatherEntity.maxTemperature}$degreeSymbol  L:${weatherEntity.minTemperature}$degreeSymbol',
+                                          'H:${homeProvider.getTemperatureInScale(context, weatherModel.daily!.first.temp!.max!)}$degreeSymbol  L:${homeProvider.getTemperatureInScale(context, weatherModel.daily!.first.temp!.min!)}$degreeSymbol',
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodySmall!

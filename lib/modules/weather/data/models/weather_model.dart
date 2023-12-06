@@ -1,7 +1,4 @@
-import '../../business/entities/city_entity.dart';
-import '../../business/entities/weather_entity.dart';
-
-class WeatherModel extends WeatherEntity {
+class WeatherModel {
   double? lat;
   double? lon;
   String? timezone;
@@ -17,42 +14,7 @@ class WeatherModel extends WeatherEntity {
       this.timezoneOffset,
       this.current,
       this.hourly,
-      this.daily})
-      : super(
-          city: CityEntity(
-            name: timezone ?? '',
-            time: current?.dt ?? 0,
-            timezoneOffset: timezoneOffset ?? 0,
-            lat: lat ?? 0.0,
-            lon: lon ?? 0.0,
-          ),
-          temperature: current?.temp?.toInt() ?? 0,
-          maxTemperature: daily?.first.temp?.max?.toInt() ?? 0,
-          minTemperature: daily?.first.temp?.min?.toInt() ?? 0,
-          condition: current?.weather?.first.main ?? '',
-          description: current?.weather?.first.description ?? '',
-          humidity: current?.humidity?.toDouble() ?? 0.0,
-          dewPoint: current?.dewPoint?.toDouble() ?? 0.0,
-          windSpeed: current?.windSpeed?.toDouble() ?? 0.0,
-          windGusts: current?.windGust?.toDouble() ?? 0.0,
-          hourly: hourly,
-          daily: daily,
-        );
-
-  factory WeatherModel.fromWeatherEntity(WeatherEntity weatherEntity) {
-    return WeatherModel(
-      lat: weatherEntity.city.lat,
-      lon: weatherEntity.city.lon,
-      timezone: weatherEntity.city.name,
-      timezoneOffset: weatherEntity.city.timezoneOffset,
-      current: Current(
-        dt: weatherEntity.city.time,
-        // ... (populate other properties from WeatherEntity)
-      ),
-      hourly: weatherEntity.hourly,
-      daily: weatherEntity.daily,
-    );
-  }
+      this.daily});
 
   factory WeatherModel.fromJson(Map<dynamic, dynamic> json) {
     return WeatherModel(
@@ -101,11 +63,11 @@ class Current {
   int? dt;
   int? sunrise;
   int? sunset;
-  double? temp;
+  int? temp;
   double? feelsLike;
   int? pressure;
   int? humidity;
-  double? dewPoint;
+  int? dewPoint;
   double? uvi;
   int? clouds;
   int? visibility;
@@ -135,11 +97,11 @@ class Current {
     dt = json['dt'];
     sunrise = json['sunrise'];
     sunset = json['sunset'];
-    temp = json['temp'].toDouble();
+    temp = json['temp'].toInt();
     feelsLike = json['feels_like'].toDouble();
     pressure = json['pressure'];
     humidity = json['humidity'];
-    dewPoint = json['dew_point'].toDouble();
+    dewPoint = json['dew_point'].toInt();
     uvi = json['uvi'].toDouble();
     clouds = json['clouds'];
     visibility = json['visibility'];
@@ -206,11 +168,11 @@ class Weather {
 
 class Hourly {
   int? dt;
-  double? temp;
+  int? temp;
   double? feelsLike;
   int? pressure;
   int? humidity;
-  double? dewPoint;
+  int? dewPoint;
   double? uvi;
   int? clouds;
   int? visibility;
@@ -238,11 +200,11 @@ class Hourly {
 
   Hourly.fromJson(Map<dynamic, dynamic> json) {
     dt = json['dt'];
-    temp = json['temp'].toDouble();
+    temp = json['temp'].toInt();
     feelsLike = json['feels_like'].toDouble();
     pressure = json['pressure'];
     humidity = json['humidity'];
-    dewPoint = json['dew_point'].toDouble();
+    dewPoint = json['dew_point'].toInt();
     uvi = json['uvi'].toDouble();
     clouds = json['clouds'];
     visibility = json['visibility'];
@@ -292,7 +254,7 @@ class Daily {
   FeelsLike? feelsLike;
   int? pressure;
   int? humidity;
-  double? dewPoint;
+  int? dewPoint;
   double? windSpeed;
   int? windDeg;
   double? windGust;
@@ -336,7 +298,7 @@ class Daily {
         : null;
     pressure = json['pressure'];
     humidity = json['humidity'];
-    dewPoint = json['dew_point'].toDouble();
+    dewPoint = json['dew_point'].toInt();
     windSpeed = json['wind_speed'].toDouble();
     windDeg = json['wind_deg'];
     windGust = json['wind_gust'].toDouble();
@@ -383,22 +345,22 @@ class Daily {
 }
 
 class Temp {
-  double? day;
-  double? min;
-  double? max;
-  double? night;
-  double? eve;
-  double? morn;
+  int? day;
+  int? min;
+  int? max;
+  int? night;
+  int? eve;
+  int? morn;
 
   Temp({this.day, this.min, this.max, this.night, this.eve, this.morn});
 
   Temp.fromJson(Map<dynamic, dynamic> json) {
-    day = json['day'].toDouble();
-    min = json['min'].toDouble();
-    max = json['max'].toDouble();
-    night = json['night'].toDouble();
-    eve = json['eve'].toDouble();
-    morn = json['morn'].toDouble();
+    day = json['day'].toInt();
+    min = json['min'].toInt();
+    max = json['max'].toInt();
+    night = json['night'].toInt();
+    eve = json['eve'].toInt();
+    morn = json['morn'].toInt();
   }
 
   Map<dynamic, dynamic> toJson() {
@@ -414,18 +376,18 @@ class Temp {
 }
 
 class FeelsLike {
-  double? day;
-  double? night;
-  double? eve;
-  double? morn;
+  int? day;
+  int? night;
+  int? eve;
+  int? morn;
 
   FeelsLike({this.day, this.night, this.eve, this.morn});
 
   FeelsLike.fromJson(Map<dynamic, dynamic> json) {
-    day = json['day'].toDouble();
-    night = json['night'].toDouble();
-    eve = json['eve'].toDouble();
-    morn = json['morn'].toDouble();
+    day = json['day'].toInt();
+    night = json['night'].toInt();
+    eve = json['eve'].toInt();
+    morn = json['morn'].toInt();
   }
 
   Map<dynamic, dynamic> toJson() {

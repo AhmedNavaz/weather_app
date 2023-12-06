@@ -39,7 +39,6 @@ class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
     );
     if (response.statusCode == 200) {
       WeatherModel weatherModel = WeatherModel.fromJson(response.data);
-      weatherModel.city.name = cityName;
       weatherModel.timezone = cityName;
       return weatherModel;
     } else {

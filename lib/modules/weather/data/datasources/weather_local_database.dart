@@ -1,5 +1,3 @@
-import 'package:weather_app/modules/weather/business/entities/weather_entity.dart';
-
 import '../../../../core/errors/exceptions.dart';
 import '../../../../utils/hive.dart';
 import '../models/weather_model.dart';
@@ -25,8 +23,7 @@ class WeatherLocalDataSourceImpl implements WeatherLocalDataSource {
       List<WeatherModel> weatherList = await getAllWeathers();
 
       int existingIndex = weatherList.indexWhere(
-        (existingWeather) =>
-            existingWeather.city.name == weatherModel.city.name,
+        (existingWeather) => existingWeather.timezone == weatherModel.timezone,
       );
 
       if (existingIndex != -1) {
@@ -75,7 +72,7 @@ class WeatherLocalDataSourceImpl implements WeatherLocalDataSource {
   Future<void> deleteWeather(String key) async {
     var getPreviousWeather = await HiveDatabase.getCache(HiveDatabase.weather);
     for (int i = 0; i < getPreviousWeather.length; i++) {
-      if (WeatherModel.fromJson(getPreviousWeather[i]).city.name == key) {
+      if (WeatherModel.fromJson(getPreviousWeather[i]).timezone == key) {
         getPreviousWeather.removeAt(i);
         break;
       }

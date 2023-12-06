@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
 import 'package:weather_app/modules/weather/presentation/providers/home_provider.dart';
 import 'package:weather_app/modules/weather/presentation/providers/searhbar_provider.dart';
-import 'dart:math' as math;
 
 import 'package:weather_app/modules/weather/presentation/widget/dropdown_widget.dart';
 import 'package:weather_app/modules/weather/presentation/widget/weather_card_widget.dart';
 
+import '../extension/sliver_appbar_delegate_extention.dart';
 import '../widget/searchbar_widget.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,7 +20,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Consumer<HomeProvider>(builder: (context, homeProvider, child) {
       return Scaffold(
         appBar: context.read<SearchBarProvider>().isSearching
@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
               Consumer<SearchBarProvider>(
                   builder: (context, searchBarProvider, child) {
                 return SliverPersistentHeader(
-                  delegate: _SliverAppBarDelegate(
+                  delegate: SliverAppBarDelegate(
                     minHeight: homeProvider.headerHeight,
                     maxHeight: homeProvider.headerHeight,
                     child: searchBarProvider.isSearching
@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
               }),
               SliverPersistentHeader(
                 pinned: true,
-                delegate: _SliverAppBarDelegate(
+                delegate: SliverAppBarDelegate(
                   minHeight: 60,
                   maxHeight: 60,
                   child: SearchBarWidget(
@@ -97,11 +97,11 @@ class _HomePageState extends State<HomePage> {
                           children: homeProvider.cities
                               .asMap()
                               .map(
-                                (index, weatherEntity) => MapEntry(
+                                (index, weatherModel) => MapEntry(
                                     index,
                                     WeatherCardWidget(
-                                      key: ValueKey(weatherEntity),
-                                      weatherEntity: weatherEntity,
+                                      key: ValueKey(weatherModel),
+                                      weatherModel: weatherModel,
                                       index: index,
                                     )),
                               )
@@ -110,7 +110,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         searchbarProvider.isSearching
                             ? Container(
-                                height: size.height * 0.9,
+                                height: 90.h,
                                 color: Colors.black87,
                               )
                             : const SizedBox(),
@@ -122,36 +122,5 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     });
-  }
-}
-
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  _SliverAppBarDelegate({
-    required this.minHeight,
-    required this.maxHeight,
-    required this.child,
-  });
-
-  final double minHeight;
-  final double maxHeight;
-  final Widget child;
-
-  @override
-  double get minExtent => minHeight;
-
-  @override
-  double get maxExtent => math.max(maxHeight, minHeight);
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return SizedBox.expand(child: child);
-  }
-
-  @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return maxHeight != oldDelegate.maxHeight ||
-        minHeight != oldDelegate.minHeight ||
-        child != oldDelegate.child;
   }
 }

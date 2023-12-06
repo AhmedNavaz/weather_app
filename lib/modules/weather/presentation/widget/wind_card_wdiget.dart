@@ -2,17 +2,18 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 import '../../../../utils/helper.dart';
 
 class WindCardWidget extends StatelessWidget {
-  const WindCardWidget(
-      {super.key,
-      required this.height,
-      required this.windSpeed,
-      required this.windGusts,
-      this.verticalPadding = 12,
-      this.horizontalPadding = 10});
+  WindCardWidget({
+    super.key,
+    required this.height,
+    required this.windSpeed,
+    required this.windGusts,
+  })  : verticalPadding = 1.3.h,
+        horizontalPadding = 1.1.h;
 
   final double height;
   final double windSpeed;
@@ -44,7 +45,7 @@ class WindCardWidget extends StatelessWidget {
                       color: Theme.of(context).indicatorColor,
                       size: 15,
                     ),
-                    const SizedBox(width: 5),
+                    SizedBox(width: 1.5.w),
                     Text(
                       'Wind'.toUpperCase(),
                       style: Theme.of(context)
@@ -54,14 +55,14 @@ class WindCardWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 1.h),
                 Row(
                   children: [
                     Text(
                       '${windSpeed.toInt()}',
                       style: Theme.of(context).textTheme.displayMedium,
                     ),
-                    const SizedBox(width: 7.5),
+                    SizedBox(width: 2.w),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -89,7 +90,7 @@ class WindCardWidget extends StatelessWidget {
                       '${windGusts.toInt()}',
                       style: Theme.of(context).textTheme.displayMedium,
                     ),
-                    const SizedBox(width: 7.5),
+                    SizedBox(width: 2.w),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

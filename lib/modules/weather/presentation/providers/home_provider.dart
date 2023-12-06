@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
-import 'package:weather_app/modules/weather/business/entities/weather_entity.dart';
 import 'package:weather_app/modules/weather/business/usecases/get_weather.dart';
 import 'package:weather_app/modules/weather/data/datasources/weather_local_database.dart';
 import 'package:weather_app/modules/weather/data/models/weather_model.dart';
@@ -12,12 +11,10 @@ import 'package:weather_app/modules/weather/data/repositories/weather_repository
 import 'package:weather_app/modules/weather/presentation/providers/settings_provider.dart';
 
 import '../../../../core/connection/network_info.dart';
+import '../../../../core/constants/constants.dart';
 import '../../../../core/params/params.dart';
 import '../../../../utils/helper.dart';
-import '../../../../utils/hive.dart';
-import '../../business/entities/city_entity.dart';
 import '../../data/datasources/weather_remote_database.dart';
-import '../widget/weather_details_widget.dart';
 
 class HomeProvider extends ChangeNotifier {
   HomeProvider() {
@@ -33,10 +30,10 @@ class HomeProvider extends ChangeNotifier {
 
   // variables
 
-  WeatherEntity? _weatherEntity;
+  WeatherModel? _weatherModel;
   bool _isAppBarPinned = false;
   final double _headerHeight = 27.5;
-  List<WeatherEntity> _cities = [];
+  List<WeatherModel> _cities = [];
   String _myLocation = '';
 
   late ScrollController _scrollController;
@@ -46,11 +43,11 @@ class HomeProvider extends ChangeNotifier {
 
   double get headerHeight => _headerHeight;
 
-  List<WeatherEntity> get cities => _cities;
+  List<WeatherModel> get cities => _cities;
 
   ScrollController get scrollController => _scrollController;
 
-  WeatherEntity? get weatherEntity => _weatherEntity;
+  WeatherModel? get weatherModel => _weatherModel;
 
   String get myLocation => _myLocation;
 
@@ -75,9 +72,10 @@ class HomeProvider extends ChangeNotifier {
       } else {
         for (var weather in _cities) {
           eitherFailureOrWeather(WeatherParams(
-              lat: weather.city.lat,
-              lon: weather.city.lon,
-              cityName: weather.city.name));
+            lat: weather.lat!,
+            lon: weather.lon!,
+            cityName: weather.timezone!,
+          ));
         }
       }
     } catch (e) {
@@ -102,54 +100,58 @@ class HomeProvider extends ChangeNotifier {
     failureOrWeather.fold(
       (failure) => null,
       (weather) {
-        _weatherEntity = weather;
-        addCard(_weatherEntity!);
+        _weatherModel = weather;
+        addCard(_weatherModel!);
         notifyListeners();
       },
     );
   }
 
-  void showAddNewWeatherSheet(BuildContext context, String cityName) {
-    _weatherEntity = null;
-    Helper.newCityWeatherSheet(
-      context,
-      _weatherEntity == null
-          ? WeatherEntity(
-              city: CityEntity(
-                name: cityName,
-                time: 1,
-                timezoneOffset: 0,
-                lat: 0,
-                lon: 0,
-              ),
-              temperature: 0,
-              maxTemperature: 0,
-              minTemperature: 0,
-              condition: '',
-              description: '',
-              humidity: 0,
-              windSpeed: 0,
-              windGusts: 0,
-              dewPoint: 0,
-              hourly: [],
-              daily: [],
-            )
-          : _weatherEntity!,
-      _weatherEntity != null ? true : false,
+  Future<void> showAddNewWeatherSheet(
+      BuildContext context, String cityName) async {
+    _weatherModel = WeatherModel(
+      timezone: cityName,
+      current: Current(
+        temp: 0,
+        weather: [Weather(description: 'Clear')],
+        windSpeed: 0,
+        windGust: 0,
+        humidity: 0,
+        dewPoint: 0,
+      ),
+      daily: [
+        Daily(
+            temp: Temp(max: 0, min: 0),
+            weather: [Weather(description: 'Clear')],
+            summary: 'Fetching')
+      ],
+      hourly: [
+        Hourly(
+          temp: 0,
+          weather: [Weather(description: 'Clear')],
+        )
+      ],
     );
+    notifyListeners();
+    bool? cancel = await Helper.newCityWeatherSheet(context);
+    if (cancel!) {
+      int index = _cities.indexWhere((element) => element.timezone == cityName);
+      removeCard(index);
+      notifyListeners();
+    }
   }
 
-  void addCard(WeatherEntity newWeatherEntity) {
+  void addCard(WeatherModel newWeatherModel) {
     bool cityExists = false;
     for (int i = 0; i < _cities.length; i++) {
-      if (_cities[i].city.name == newWeatherEntity.city.name) {
-        _cities[i] = newWeatherEntity;
+      if (_cities[i].timezone == newWeatherModel.timezone) {
+        _cities[i] = newWeatherModel;
         cityExists = true;
         break;
       }
     }
     if (!cityExists) {
-      _cities.add(newWeatherEntity);
+      _cities.add(newWeatherModel);
     }
     notifyListeners();
   }
@@ -158,14 +160,14 @@ class HomeProvider extends ChangeNotifier {
     if (newIndex > oldIndex) {
       newIndex -= 1;
     }
-    final WeatherEntity card = _cities.removeAt(oldIndex);
+    final WeatherModel card = _cities.removeAt(oldIndex);
     _cities.insert(newIndex, card);
     WeatherLocalDataSourceImpl().reOrderWeather(_cities);
     notifyListeners();
   }
 
   void removeCard(int index) {
-    WeatherLocalDataSourceImpl().deleteWeather(_cities[index].city.name);
+    WeatherLocalDataSourceImpl().deleteWeather(_cities[index].timezone!);
     _cities.removeAt(index);
     notifyListeners();
   }
@@ -186,9 +188,8 @@ class HomeProvider extends ChangeNotifier {
     );
   }
 
-  String getBackgroundImage(String main, DateTime time) {
+  String getBackgroundImageCard(String main, DateTime time) {
     bool isDay = time.hour > 6 && time.hour < 18;
-    String dayOrNight = isDay ? 'day' : 'night';
     switch (main.toLowerCase()) {
       case 'clouds':
       case 'mist':
@@ -196,14 +197,37 @@ class HomeProvider extends ChangeNotifier {
       case 'haze':
       case 'dust':
       case 'fog':
-        return 'assets/images/$dayOrNight/cloudy.jpg';
+        return isDay ? cloudyDay : cloudyNight;
       case 'rain':
       case 'drizzle':
       case 'shower rain':
       case 'thunderstorm':
-        return 'assets/images/$dayOrNight/rainy.jpg';
+        return isDay ? rainyDay : rainyNight;
       case 'clear':
-        return 'assets/images/$dayOrNight/clear.jpg';
+        return isDay ? sunnyDay : clearNight;
+      default:
+        return 'assets/images/day/clear.jpg';
+    }
+  }
+
+  String getBackgroundImageSheet(String main, DateTime time) {
+    bool isDay = time.hour > 6 && time.hour < 18;
+    switch (main.toLowerCase()) {
+      case 'clouds':
+      case 'mist':
+      case 'smoke':
+      case 'haze':
+      case 'dust':
+      case 'fog':
+        return isDay ? cloudyDay : cloudyNight;
+      case 'rain':
+      case 'drizzle':
+      case 'shower rain':
+        return raining;
+      case 'thunderstorm':
+        return thunderstorm;
+      case 'clear':
+        return isDay ? sunnyDay : clearNight;
       default:
         return 'assets/images/day/clear.jpg';
     }

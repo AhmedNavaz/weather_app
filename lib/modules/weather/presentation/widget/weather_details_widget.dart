@@ -2,23 +2,23 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:weather_app/modules/weather/business/entities/weather_entity.dart';
 import 'package:weather_app/modules/weather/presentation/extension/string_extention.dart';
 import 'package:weather_app/modules/weather/presentation/providers/home_provider.dart';
 import 'package:weather_app/modules/weather/presentation/widget/wind_card_wdiget.dart';
+import 'package:sizer/sizer.dart';
 
 import '../../../../core/constants/constants.dart';
+import '../../data/models/weather_model.dart';
 import 'hourly_card_widget.dart';
 import 'humidity_card_widget.dart';
 
 class WeatherDetailsWidget extends StatelessWidget {
-  const WeatherDetailsWidget({super.key, required this.weatherEntity});
+  const WeatherDetailsWidget({super.key, required this.weatherModel});
 
-  final WeatherEntity weatherEntity;
+  final WeatherModel weatherModel;
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Consumer<HomeProvider>(builder: (context, homeProvider, child) {
       return Container(
         padding: const EdgeInsets.all(20),
@@ -26,51 +26,48 @@ class WeatherDetailsWidget extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
-              const SizedBox(height: 50),
+              SizedBox(height: 05.h),
               Text(
-                weatherEntity.city.name,
+                weatherModel.timezone!,
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
               Text(
-                '${weatherEntity.temperature}$degreeSymbol',
+                '${homeProvider.getTemperatureInScale(context, weatherModel.current!.temp!)}$degreeSymbol',
                 style: Theme.of(context).textTheme.displayLarge,
               ),
               Text(
-                weatherEntity.description.capitalizeByWord(),
+                weatherModel.current!.weather!.first.description!
+                    .capitalizeByWord(),
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
-              const SizedBox(height: 5),
+              SizedBox(height: 0.5.h),
               Text(
-                'H:${weatherEntity.maxTemperature}$degreeSymbol  L:${weatherEntity.minTemperature}$degreeSymbol',
+                'H:${homeProvider.getTemperatureInScale(context, weatherModel.daily!.first.temp!.max!)}$degreeSymbol  L:${homeProvider.getTemperatureInScale(context, weatherModel.daily!.first.temp!.min!)}$degreeSymbol',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
               ),
-              const SizedBox(height: 40),
-              homeProvider.weatherEntity != null
-                  ? HourlyCardWidget(
-                      weatherEntity: weatherEntity,
-                      height: size.height * 0.09,
-                    )
-                  : const SizedBox(),
-              const SizedBox(height: 5),
-              homeProvider.weatherEntity != null
-                  ? Row(
-                      children: [
-                        WindCardWidget(
-                          height: size.height * 0.18,
-                          windSpeed: weatherEntity.windSpeed,
-                          windGusts: weatherEntity.windGusts,
-                        ),
-                        const SizedBox(width: 5),
-                        HumidityCardWidget(
-                          height: size.height * 0.18,
-                          humidity: weatherEntity.humidity,
-                          dewPoint: weatherEntity.dewPoint,
-                        ),
-                      ],
-                    )
-                  : const SizedBox(),
+              SizedBox(height: 4.h),
+              HourlyCardWidget(
+                weatherModel: weatherModel,
+                height: 10.4.h,
+              ),
+              SizedBox(height: 1.h),
+              Row(
+                children: [
+                  WindCardWidget(
+                    height: 19.h,
+                    windSpeed: weatherModel.current!.windSpeed!,
+                    windGusts: weatherModel.current!.windGust ?? 0,
+                  ),
+                  SizedBox(width: 2.w),
+                  HumidityCardWidget(
+                    height: 19.h,
+                    humidity: weatherModel.current!.humidity!,
+                    dewPoint: weatherModel.current!.dewPoint!,
+                  ),
+                ],
+              )
             ],
           ),
         ),

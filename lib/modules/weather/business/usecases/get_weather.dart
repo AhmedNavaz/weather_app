@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failure.dart';
 import '../../../../core/params/params.dart';
-import '../entities/weather_entity.dart';
+import '../../data/models/weather_model.dart';
 import '../repositories/weather_repository.dart';
 
 class GetWeather {
@@ -10,7 +10,7 @@ class GetWeather {
 
   GetWeather(this.repository);
 
-  Future<Either<Failure, WeatherEntity>> call(
+  Future<Either<Failure, WeatherModel>> call(
       {required WeatherParams params}) async {
     return await repository.getWeather(params: params);
   }

@@ -3,7 +3,8 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:weather_app/modules/weather/business/entities/weather_entity.dart';
+import 'package:sizer/sizer.dart';
+import 'package:weather_app/modules/weather/data/models/weather_model.dart';
 import 'package:weather_app/modules/weather/presentation/providers/home_provider.dart';
 
 import '../../../../utils/helper.dart';
@@ -54,17 +55,17 @@ class _WeatherDetailsPageState extends State<WeatherDetailsPage>
   @override
   Widget build(BuildContext context) {
     final HomeProvider homeProvider = context.read<HomeProvider>();
-    final List<WeatherEntity> cities = homeProvider.cities;
+    final List<WeatherModel> cities = homeProvider.cities;
     DateTime localTime = Helper.convertToLocalTime(
-      cities[_currentIndex].city.time,
-      cities[_currentIndex].city.timezoneOffset,
+      cities[_currentIndex].current!.dt!,
+      cities[_currentIndex].timezoneOffset!,
     );
-    String backgroundImage = homeProvider.getBackgroundImage(
-      cities[_currentIndex].condition,
+    String backgroundImage = homeProvider.getBackgroundImageSheet(
+      cities[_currentIndex].current!.weather!.first.main!,
       localTime,
     );
     return Hero(
-      tag: cities[widget.index].city.name,
+      tag: cities[widget.index].timezone!,
       child: Scaffold(
         extendBody: true,
         extendBodyBehindAppBar: true,
@@ -85,7 +86,7 @@ class _WeatherDetailsPageState extends State<WeatherDetailsPage>
               child: FadeTransition(
                 opacity: animation,
                 child: SizedBox(
-                  height: MediaQuery.of(context).size.height,
+                  height: 100.h,
                   child: Image.asset(
                     backgroundImage,
                     fit: BoxFit.cover,
@@ -106,7 +107,7 @@ class _WeatherDetailsPageState extends State<WeatherDetailsPage>
               },
               itemBuilder: (context, index) {
                 return WeatherDetailsWidget(
-                  weatherEntity: cities[index],
+                  weatherModel: cities[index],
                 );
               },
             ),
@@ -116,7 +117,7 @@ class _WeatherDetailsPageState extends State<WeatherDetailsPage>
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
                   child: Container(
-                    width: MediaQuery.of(context).size.width,
+                    width: 100.w,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     height: 35,
                     decoration: BoxDecoration(

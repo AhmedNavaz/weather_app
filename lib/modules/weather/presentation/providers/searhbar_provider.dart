@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:provider/provider.dart';
-import 'package:weather_app/modules/weather/business/entities/city_entity.dart';
-import 'package:weather_app/modules/weather/business/entities/weather_entity.dart';
 import 'package:weather_app/modules/weather/presentation/extension/string_extention.dart';
-import 'package:weather_app/modules/weather/presentation/widget/weather_details_widget.dart';
 import 'package:weather_app/utils/helper.dart';
 
 import '../../../../core/params/params.dart';
-import '../../data/models/weather_model.dart';
 import 'home_provider.dart';
 
 class SearchBarProvider extends ChangeNotifier {

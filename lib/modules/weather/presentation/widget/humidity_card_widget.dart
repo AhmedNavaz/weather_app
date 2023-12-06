@@ -2,28 +2,31 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
+import 'package:weather_app/modules/weather/presentation/providers/home_provider.dart';
 
 import '../../../../core/constants/constants.dart';
-import '../../../../utils/helper.dart';
 
 class HumidityCardWidget extends StatelessWidget {
-  const HumidityCardWidget(
-      {super.key,
-      required this.height,
-      required this.humidity,
-      required this.dewPoint,
-      this.verticalPadding = 12,
-      this.horizontalPadding = 10});
+  HumidityCardWidget({
+    super.key,
+    required this.height,
+    required this.humidity,
+    required this.dewPoint,
+  })  : verticalPadding = 1.3.h,
+        horizontalPadding = 1.1.h;
 
   final double height;
-  final double humidity;
-  final double dewPoint;
+  final int humidity;
+  final int dewPoint;
 
   final double verticalPadding;
   final double horizontalPadding;
 
   @override
   Widget build(BuildContext context) {
+    HomeProvider homeProvider = context.read<HomeProvider>();
     return Expanded(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
@@ -46,7 +49,7 @@ class HumidityCardWidget extends StatelessWidget {
                       color: Theme.of(context).indicatorColor,
                       size: 15,
                     ),
-                    const SizedBox(width: 5),
+                    SizedBox(width: 1.5.w),
                     Text(
                       'Humidity'.toUpperCase(),
                       style: Theme.of(context)
@@ -56,16 +59,16 @@ class HumidityCardWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  '${humidity.toInt()}%',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
+                SizedBox(height: 1.5.h),
+                Text('${humidity.toInt()}%',
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          fontSize: 15.4.sp,
+                        )),
                 const Spacer(),
                 Text(
-                  'The dew point is $dewPoint$degreeSymbol right now.',
+                  'The dew point is ${homeProvider.getTemperatureInScale(context, dewPoint)}$degreeSymbol right now.',
                   style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                        fontSize: 13,
+                        fontSize: 10.sp,
                       ),
                 ),
               ],
