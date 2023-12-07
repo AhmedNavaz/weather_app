@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:weather_app/core/connection/connection.dart';
 import 'package:weather_app/modules/weather/presentation/providers/home_provider.dart';
 import 'package:weather_app/modules/weather/presentation/providers/searhbar_provider.dart';
 
