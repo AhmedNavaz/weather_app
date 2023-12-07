@@ -7,9 +7,12 @@ import 'package:weather_app/modules/weather/presentation/providers/home_provider
 import 'package:weather_app/modules/weather/presentation/providers/searhbar_provider.dart';
 
 class SearchBarWidget extends StatelessWidget {
-  SearchBarWidget({super.key, required this.isAppBarPinned});
+  const SearchBarWidget({
+    super.key,
+    required this.isAppBarPinned,
+  });
 
-  bool isAppBarPinned = false;
+  final bool isAppBarPinned;
 
   @override
   Widget build(BuildContext context) {

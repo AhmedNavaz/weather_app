@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:provider/provider.dart';
@@ -42,11 +43,8 @@ class SearchBarProvider extends ChangeNotifier {
     changeSearchingState(false);
     notifyListeners();
     try {
-      print(_searchingCity);
       List<Location> locations =
           await locationFromAddress(_searchingCity.trim());
-      print(locations[0].longitude);
-      print(locations[0].latitude);
       context
           .read<HomeProvider>()
           .showAddNewWeatherSheet(context, _searchingCity.capitalizeByWord());
@@ -58,7 +56,9 @@ class SearchBarProvider extends ChangeNotifier {
             ),
           );
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
       Helper.showAlertDialog(context, 'Error', 'Location not found');
     }
   }

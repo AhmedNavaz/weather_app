@@ -60,11 +60,11 @@ class MyApp extends StatelessWidget {
               labelMedium: GoogleFonts.inter(
                 fontSize: 8.4.sp,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey,
+                color: Colors.white.withOpacity(0.5),
               ),
               labelSmall: GoogleFonts.inter(
                 fontSize: 7.sp,
-                color: Colors.grey,
+                color: Colors.white.withOpacity(0.5),
               ),
               bodyLarge: GoogleFonts.inter(
                 fontSize: 11.2.sp,

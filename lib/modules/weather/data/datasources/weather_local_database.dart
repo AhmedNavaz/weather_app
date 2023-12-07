@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../../../../core/errors/exceptions.dart';
 import '../../../../utils/hive.dart';
 import '../models/weather_model.dart';
@@ -35,7 +37,9 @@ class WeatherLocalDataSourceImpl implements WeatherLocalDataSource {
       HiveDatabase.storeCache(HiveDatabase.weather,
           weatherList.map((weather) => weather.toJson()).toList());
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -63,7 +67,9 @@ class WeatherLocalDataSourceImpl implements WeatherLocalDataSource {
         throw CacheException();
       }
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
       return [];
     }
   }
