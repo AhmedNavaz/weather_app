@@ -80,7 +80,7 @@ class Helper {
                   topRight: Radius.circular(20),
                 ),
               ),
-              height: 95.h,
+              height: 92.h,
               child: Column(
                 children: [
                   Padding(
