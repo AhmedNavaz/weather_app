@@ -16,12 +16,16 @@ class NoInternetWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isOnline = context.watch<ConnectionNotifier>().isOnline;
+    if (context.read<HomeProvider>().cities.isEmpty) {
+      return const SizedBox();
+    }
     WeatherModel weatherModel = context.read<HomeProvider>().cities[0];
     DateTime lastConnectedTime = Helper.convertToLocalTime(
       weatherModel.current!.dt!,
       weatherModel.timezoneOffset!,
     );
-    return context.watch<ConnectionNotifier>().isOnline
+    return isOnline
         ? const SizedBox()
         : ClipRRect(
             child: BackdropFilter(

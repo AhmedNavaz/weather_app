@@ -1,18 +1,16 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:weather_app/core/connection/connection.dart';
-import 'package:weather_app/modules/weather/data/models/weather_model.dart';
 import 'package:weather_app/modules/weather/presentation/providers/home_provider.dart';
-import 'package:weather_app/modules/weather/presentation/providers/searhbar_provider.dart';
+import 'package:weather_app/modules/weather/presentation/providers/searchbar_provider.dart';
 
 import 'package:weather_app/modules/weather/presentation/widget/dropdown_widget.dart';
 import 'package:weather_app/modules/weather/presentation/widget/no_internet_widget.dart';
 import 'package:weather_app/modules/weather/presentation/widget/weather_card_widget.dart';
 
-import '../../../../utils/helper.dart';
 import '../extension/sliver_appbar_delegate_extention.dart';
 import '../widget/searchbar_widget.dart';
 
@@ -26,8 +24,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    // Use Consumer to rebuild the widget when the state of HomeProvider changes
     return Consumer<HomeProvider>(builder: (context, homeProvider, child) {
       return Scaffold(
+        // AppBar with conditional rendering based on search state
         appBar: context.read<SearchBarProvider>().isSearching
             ? AppBar(
                 toolbarHeight: 0,
@@ -46,6 +46,7 @@ class _HomePageState extends State<HomePage> {
                       style: Theme.of(context).textTheme.headlineSmall),
                 ),
                 actions: const [
+                  // DropDownWidget for additional actions
                   DropDownWidget(),
                 ],
               ),
@@ -53,6 +54,7 @@ class _HomePageState extends State<HomePage> {
           physics: const BouncingScrollPhysics(),
           controller: homeProvider.scrollController,
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            // SliverPersistentHeader for persistent header with search bar
             return [
               Consumer<SearchBarProvider>(
                   builder: (context, searchBarProvider, child) {
@@ -61,9 +63,7 @@ class _HomePageState extends State<HomePage> {
                     minHeight: homeProvider.headerHeight,
                     maxHeight: homeProvider.headerHeight,
                     child: searchBarProvider.isSearching
-                        ? const SizedBox(
-                            height: 12,
-                          )
+                        ? const SizedBox(height: 12)
                         : Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 15),
                             child: Text(
@@ -74,6 +74,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               }),
+              // SliverPersistentHeader for pinned search bar
               SliverPersistentHeader(
                 pinned: true,
                 delegate: SliverAppBarDelegate(
@@ -85,50 +86,67 @@ class _HomePageState extends State<HomePage> {
               ),
             ];
           },
-          body: homeProvider.cities.isNotEmpty
-              ? Theme(
-                  data: Theme.of(context).copyWith(
-                    canvasColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
+          // Body of NestedScrollView
+          body: Theme(
+            data: Theme.of(context).copyWith(
+              canvasColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+            ),
+            child: Consumer<SearchBarProvider>(
+                builder: (context, searchbarProvider, child) {
+              return Stack(
+                children: [
+                  // ReorderableListView for displaying weather cards
+                  ReorderableListView(
+                    physics: const BouncingScrollPhysics(),
+                    onReorder: (int oldIndex, int newIndex) {
+                      homeProvider.reOrderCards(oldIndex, newIndex);
+                    },
+                    children: [
+                      // Loading indicator when syncing data online
+                      homeProvider.isLoading &&
+                              context.watch<ConnectionNotifier>().isOnline
+                          ? Center(
+                              key: UniqueKey(),
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: Text(
+                                  'Syncing Weather Data ...',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ),
+                            )
+                          : SizedBox(key: UniqueKey()),
+                      // Widget for displaying no internet connection message
+                      NoInternetWidget(key: UniqueKey()),
+                      // Display weather cards
+                      ...homeProvider.cities
+                          .asMap()
+                          .map(
+                            (index, weatherModel) => MapEntry(
+                              index,
+                              WeatherCardWidget(
+                                key: ValueKey(weatherModel),
+                                weatherModel: weatherModel,
+                                index: index,
+                              ),
+                            ),
+                          )
+                          .values
+                          .toList(),
+                    ],
                   ),
-                  child: Consumer<SearchBarProvider>(
-                      builder: (context, searchbarProvider, child) {
-                    return Stack(
-                      children: [
-                        ReorderableListView(
-                          physics: const BouncingScrollPhysics(),
-                          onReorder: (int oldIndex, int newIndex) {
-                            homeProvider.reOrderCards(oldIndex, newIndex);
-                          },
-                          children: [
-                            NoInternetWidget(key: UniqueKey()),
-                            ...homeProvider.cities
-                                .asMap()
-                                .map(
-                                  (index, weatherModel) => MapEntry(
-                                    index,
-                                    WeatherCardWidget(
-                                      key: ValueKey(weatherModel),
-                                      weatherModel: weatherModel,
-                                      index: index,
-                                    ),
-                                  ),
-                                )
-                                .values
-                                .toList(),
-                          ],
-                        ),
-                        searchbarProvider.isSearching
-                            ? Container(
-                                height: 90.h,
-                                color: Colors.black87,
-                              )
-                            : const SizedBox(),
-                      ],
-                    );
-                  }),
-                )
-              : const Center(child: Text('Getting Weather Data...')),
+                  // Dark overlay when searching
+                  searchbarProvider.isSearching
+                      ? Container(
+                          height: 90.h,
+                          color: Colors.black87,
+                        )
+                      : const SizedBox(),
+                ],
+              );
+            }),
+          ),
         ),
       );
     });

@@ -8,7 +8,9 @@ import 'package:weather_app/modules/weather/presentation/widget/weather_details_
 
 import '../modules/weather/data/models/weather_model.dart';
 
+// Helper class containing utility methods for the weather app.
 class Helper {
+  // Show an alert dialog with the provided title and message.
   static void showAlertDialog(
       BuildContext context, String title, String message) {
     showCupertinoDialog(
@@ -30,6 +32,7 @@ class Helper {
     );
   }
 
+  // Create a divider widget with customizable height and padding.
   static Widget divider(BuildContext context,
       {double height = 30, double horizontalPadding = 4}) {
     return Divider(
@@ -41,6 +44,7 @@ class Helper {
     );
   }
 
+  // Show a bottom sheet to add new city weather data.
   static Future<bool?> newCityWeatherSheet(BuildContext context) async {
     bool? result = await showModalBottomSheet<bool>(
       isScrollControlled: true,
@@ -122,6 +126,7 @@ class Helper {
     return result ?? true;
   }
 
+  // Convert UTC time to local time.
   static DateTime convertToLocalTime(int dt, int timezoneOffset) {
     DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(dt * 1000);
     DateTime utcDateTime = dateTime.toUtc();
@@ -129,10 +134,12 @@ class Helper {
     return localDateTime;
   }
 
+  // Convert temperature from Celsius to Fahrenheit.
   static int celsiusToFahrenheit(int celsius) {
     return ((celsius * 9 / 5) + 32).round();
   }
 
+  // Get the display text for the last connected time.
   String getLastConnectedTime(DateTime dateTime) {
     DateTime now = DateTime.now();
     DateTime yesterday = now.subtract(const Duration(days: 1));
@@ -150,6 +157,7 @@ class Helper {
     }
   }
 
+  // Get the month name based on the month number.
   String _getMonthName(int month) {
     switch (month) {
       case 1:

@@ -1,3 +1,4 @@
+// api constants
 String weatherUrl = 'https://api.openweathermap.org/data/3.0/onecall';
 String weatherIconUrl = 'http://openweathermap.org/img/w/';
 String apiKey = '83c58183aacfc5dea87c7266d44ad0f5';

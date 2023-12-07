@@ -56,22 +56,28 @@ class _WeatherDetailsPageState extends State<WeatherDetailsPage>
   Widget build(BuildContext context) {
     final HomeProvider homeProvider = context.read<HomeProvider>();
     final List<WeatherModel> cities = homeProvider.cities;
+
+    // Convert the timestamp to local time
     DateTime localTime = Helper.convertToLocalTime(
       cities[_currentIndex].current!.dt!,
       cities[_currentIndex].timezoneOffset!,
     );
+
+    // Get the background image based on weather conditions
     String backgroundImage = homeProvider.getBackgroundImageSheet(
       cities[_currentIndex].current!.weather!.first.main!,
       localTime,
     );
-    return SafeArea(
-      top: false,
-      child: Hero(
-        tag: cities[widget.index].timezone!,
+
+    return Hero(
+      tag: cities[widget.index].timezone!,
+      child: SafeArea(
+        top: false,
         child: Scaffold(
           extendBody: true,
           extendBodyBehindAppBar: true,
           backgroundColor: Colors.transparent,
+          // No appbar
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(0),
             child: AppBar(
@@ -83,6 +89,7 @@ class _WeatherDetailsPageState extends State<WeatherDetailsPage>
           body: Stack(
             alignment: Alignment.center,
             children: [
+              // Positioned widget for displaying the background image
               Positioned(
                 top: 0,
                 child: FadeTransition(
@@ -96,6 +103,7 @@ class _WeatherDetailsPageState extends State<WeatherDetailsPage>
                   ),
                 ),
               ),
+              // PageView for displaying weather details with fade transition for background image
               PageView.builder(
                 physics: const BouncingScrollPhysics(),
                 controller: pageController,
@@ -113,6 +121,7 @@ class _WeatherDetailsPageState extends State<WeatherDetailsPage>
                   );
                 },
               ),
+              // Positioned widget for the bottom navigation bar
               Positioned(
                 bottom: 0,
                 child: ClipRRect(
@@ -130,6 +139,7 @@ class _WeatherDetailsPageState extends State<WeatherDetailsPage>
                           ),
                         ),
                       ),
+                      // Row for displaying navigation indicators and back button
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -160,6 +170,7 @@ class _WeatherDetailsPageState extends State<WeatherDetailsPage>
                                     ),
                             );
                           }).toList()),
+                          // GestureDetector for going back to home page
                           GestureDetector(
                             onTap: () {
                               Navigator.pop(context);
